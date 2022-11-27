@@ -1,0 +1,12 @@
+C:\Users\bobro\RiderProjects\TestsGenerator\TestGenerator.Core\bin\Debug\net6.0\TestGenerator.Core.deps.json
+C:\Users\bobro\RiderProjects\TestsGenerator\TestGenerator.Core\bin\Debug\net6.0\TestGenerator.Core.dll
+C:\Users\bobro\RiderProjects\TestsGenerator\TestGenerator.Core\bin\Debug\net6.0\TestGenerator.Core.pdb
+C:\Users\bobro\RiderProjects\TestsGenerator\TestGenerator.Core\obj\Debug\net6.0\TestGenerator.Core.csproj.AssemblyReference.cache
+C:\Users\bobro\RiderProjects\TestsGenerator\TestGenerator.Core\obj\Debug\net6.0\TestGenerator.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\bobro\RiderProjects\TestsGenerator\TestGenerator.Core\obj\Debug\net6.0\TestGenerator.Core.AssemblyInfoInputs.cache
+C:\Users\bobro\RiderProjects\TestsGenerator\TestGenerator.Core\obj\Debug\net6.0\TestGenerator.Core.AssemblyInfo.cs
+C:\Users\bobro\RiderProjects\TestsGenerator\TestGenerator.Core\obj\Debug\net6.0\TestGenerator.Core.csproj.CoreCompileInputs.cache
+C:\Users\bobro\RiderProjects\TestsGenerator\TestGenerator.Core\obj\Debug\net6.0\TestGenerator.Core.dll
+C:\Users\bobro\RiderProjects\TestsGenerator\TestGenerator.Core\obj\Debug\net6.0\refint\TestGenerator.Core.dll
+C:\Users\bobro\RiderProjects\TestsGenerator\TestGenerator.Core\obj\Debug\net6.0\TestGenerator.Core.pdb
+C:\Users\bobro\RiderProjects\TestsGenerator\TestGenerator.Core\obj\Debug\net6.0\ref\TestGenerator.Core.dll
