@@ -6,4 +6,10 @@ namespace TestGenerator.Core;
 
 public class TestGenerator
 {
+    public string Generate()
+    {
+        
+        
+        return "";
+    }
 }
