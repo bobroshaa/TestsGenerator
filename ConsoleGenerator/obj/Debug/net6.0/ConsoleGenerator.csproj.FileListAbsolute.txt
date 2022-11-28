@@ -1,0 +1,15 @@
+C:\Users\bobro\RiderProjects\TestsGenerator\ConsoleGenerator\bin\Debug\net6.0\ConsoleGenerator.exe
+C:\Users\bobro\RiderProjects\TestsGenerator\ConsoleGenerator\bin\Debug\net6.0\ConsoleGenerator.deps.json
+C:\Users\bobro\RiderProjects\TestsGenerator\ConsoleGenerator\bin\Debug\net6.0\ConsoleGenerator.runtimeconfig.json
+C:\Users\bobro\RiderProjects\TestsGenerator\ConsoleGenerator\bin\Debug\net6.0\ConsoleGenerator.dll
+C:\Users\bobro\RiderProjects\TestsGenerator\ConsoleGenerator\bin\Debug\net6.0\ConsoleGenerator.pdb
+C:\Users\bobro\RiderProjects\TestsGenerator\ConsoleGenerator\obj\Debug\net6.0\ConsoleGenerator.csproj.AssemblyReference.cache
+C:\Users\bobro\RiderProjects\TestsGenerator\ConsoleGenerator\obj\Debug\net6.0\ConsoleGenerator.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\bobro\RiderProjects\TestsGenerator\ConsoleGenerator\obj\Debug\net6.0\ConsoleGenerator.AssemblyInfoInputs.cache
+C:\Users\bobro\RiderProjects\TestsGenerator\ConsoleGenerator\obj\Debug\net6.0\ConsoleGenerator.AssemblyInfo.cs
+C:\Users\bobro\RiderProjects\TestsGenerator\ConsoleGenerator\obj\Debug\net6.0\ConsoleGenerator.csproj.CoreCompileInputs.cache
+C:\Users\bobro\RiderProjects\TestsGenerator\ConsoleGenerator\obj\Debug\net6.0\ConsoleGenerator.dll
+C:\Users\bobro\RiderProjects\TestsGenerator\ConsoleGenerator\obj\Debug\net6.0\refint\ConsoleGenerator.dll
+C:\Users\bobro\RiderProjects\TestsGenerator\ConsoleGenerator\obj\Debug\net6.0\ConsoleGenerator.pdb
+C:\Users\bobro\RiderProjects\TestsGenerator\ConsoleGenerator\obj\Debug\net6.0\ConsoleGenerator.genruntimeconfig.cache
+C:\Users\bobro\RiderProjects\TestsGenerator\ConsoleGenerator\obj\Debug\net6.0\ref\ConsoleGenerator.dll
