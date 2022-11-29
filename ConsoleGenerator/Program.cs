@@ -4,11 +4,12 @@
     {
         static void Main(string[] args)
         {
+            /*string[] filenames;
             Console.Write("Enter filenames through \"*\": ");
             var files = Console.ReadLine();
             if (files != "")
             {
-                var filenames = files.Split("*");
+                filenames = files.Split("*");
             }
             else
             {
@@ -25,9 +26,10 @@
             }
 
             Console.Write("Enter degree of parallelism for loading source files: ");
+            int sourceFileDegreeOfParallelism;
             try
             {
-                int sourceFileDegreeOfParallelism = int.Parse(Console.ReadLine());
+                sourceFileDegreeOfParallelism = int.Parse(Console.ReadLine());
             }
             catch (Exception ex)
             {
@@ -36,9 +38,10 @@
             }
 
             Console.Write("Enter degree of parallelism for : ");
+            int taskDegreeOfParallelism;
             try
             {
-                int taskDegreeOfParallelism = int.Parse(Console.ReadLine());
+                taskDegreeOfParallelism = int.Parse(Console.ReadLine());
             }
             catch (Exception ex)
             {
@@ -47,20 +50,26 @@
             }
 
             Console.Write("Enter degree of parallelism for loading source files: ");
+            int outFileDegreeOfParallelism;
             try
             {
-                int outFileDegreeOfParallelism = int.Parse(Console.ReadLine());
+                outFileDegreeOfParallelism = int.Parse(Console.ReadLine());
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Incorrect data!");
                 return;
-            }
-            
-            
+            }*/
 
-
+            /*TestGeneratorService testGeneratorService = new TestGeneratorService(filenames,
+                sourceFileDegreeOfParallelism, taskDegreeOfParallelism, outFileDegreeOfParallelism, path);*/
+            TestGeneratorService testGeneratorService = new TestGeneratorService(new string[]{"C:\\Users\\bobro\\RiderProjects\\Assembly-Browser\\Assembly-Browser\\Example\\ExampleClass.cs"},
+                1, 1, 1, "C:\\Users\\bobro\\RiderProjects");
+            testGeneratorService.Generate();
 
         }
     }
 }
+
+//C:\Users\bobro\RiderProjects\Assembly-Browser\Assembly-Browser\Example\ExampleClass.cs
+//C:\Users\bobro\RiderProjects

@@ -4,17 +4,17 @@ namespace ConsoleGenerator;
 
 public class TestGeneratorService
 {
-    private string _filename;
+    private string[] _filenames;
     private int _sourceFileDegreeOfParallelism;
     private int _taskDegreeOfParallelism;
     private int _outFileDegreeOfParallelism;
     private string _outputDirectory;
     private TestGenerator.Core.TestGenerator _testGenerator;
 
-    public TestGeneratorService(string filename, int sourceFileDegreeOfParallelism, int taskDegreeOfParallelism,
+    public TestGeneratorService(string[] filenames, int sourceFileDegreeOfParallelism, int taskDegreeOfParallelism,
         int outFileDegreeOfParallelism, string outputDirectory)
     {
-        _filename = filename;
+        _filenames = filenames;
         _taskDegreeOfParallelism = taskDegreeOfParallelism;
         _sourceFileDegreeOfParallelism = sourceFileDegreeOfParallelism;
         _outFileDegreeOfParallelism = outFileDegreeOfParallelism;
@@ -32,27 +32,34 @@ public class TestGeneratorService
                 await reader.ReadAsync(buffer);
             }
 
-            return buffer.ToString();
+            return new string(buffer);
         }, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = _sourceFileDegreeOfParallelism });
 
-        var generateTests = new TransformBlock<string, string>(async programCode =>
+        var generateTests = new TransformBlock<string, List<TestGenerator.Core.TestGenerator.TestInfo>>(programCode =>
         {
-            return _testGenerator.Generate();
-        });
+            return _testGenerator.Generate(programCode);
+        }, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = _taskDegreeOfParallelism});
 
-        var writeTests = new ActionBlock<string>(async info =>
+        var writeTests = new ActionBlock<List<TestGenerator.Core.TestGenerator.TestInfo>>(async testInfos =>
         {
-            using (StreamWriter writer = File.CreateText($"{_outputDirectory}\\{info.ClassName}.cs"))
+            foreach (var testInfo in testInfos)
             {
-                writer.WriteAsync(info);
+                using (StreamWriter writer = File.CreateText($"{_outputDirectory}\\{testInfo.ClassName}.cs"))
+                {
+                    await writer.WriteAsync(testInfo.GeneratedCode);
+                }
             }
-        });
+        }, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = _outFileDegreeOfParallelism });
+        
+        var linkOptions = new DataflowLinkOptions { PropagateCompletion = true };
+        getProgramCode.LinkTo(generateTests, linkOptions);
+        generateTests.LinkTo(writeTests,linkOptions);
+        foreach (var file in _filenames)
+        {
+            getProgramCode.Post(file);
+            getProgramCode.Complete();
+            writeTests.Completion.Wait();
+        }
 
-        getProgramCode.LinkTo(generateTests);
-        generateTests.LinkTo(writeTests);
-
-        getProgramCode.Post(_filename);
-        getProgramCode.Complete();
-        writeTests.Completion.Wait();
     }
 }
