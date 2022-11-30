@@ -57,9 +57,8 @@ public class TestGeneratorService
         foreach (var file in _filenames)
         {
             getProgramCode.Post(file);
-            getProgramCode.Complete();
-            writeTests.Completion.Wait();
         }
-
+        getProgramCode.Complete();
+        writeTests.Completion.Wait();
     }
 }

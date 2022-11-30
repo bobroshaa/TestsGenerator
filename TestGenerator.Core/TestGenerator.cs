@@ -24,29 +24,23 @@ public class TestGenerator
     {
         SyntaxTree tree = CSharpSyntaxTree.ParseText(programText);
         CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
+        
+        var allUsings = root.DescendantNodes().OfType<UsingDirectiveSyntax>().ToArray();
+        
 
-        var classes = root.DescendantNodes().OfType<ClassDeclarationSyntax>().ToList();
+        var classes = root.DescendantNodes().OfType<ClassDeclarationSyntax>().Where(node => node.Modifiers.Any(n => n.Kind() == SyntaxKind.PublicKeyword)).ToList();
         
         MemberDeclarationSyntax? @namespace = null;
         var mainUnit = CompilationUnit();
         
         foreach (var _class in classes)
         {
-            var methods = _class.DescendantNodes().OfType<MethodDeclarationSyntax>().ToList()
-                .Where(m => m.Modifiers.Contains(Token(SyntaxKind.PublicKeyword))).ToList();
+            
+            var methods = _class.DescendantNodes().OfType<MethodDeclarationSyntax>().Where(node => node.Modifiers.Any(n => n.Kind() == SyntaxKind.PublicKeyword)).ToList();;
             //add namespace
             @namespace = NamespaceDeclaration(IdentifierName(GetNamespace(_class) + ".Test"));
 
-            var usings = new SyntaxList<UsingDirectiveSyntax>(
-                new UsingDirectiveSyntax[]
-                {
-                    UsingDirective(
-                        IdentifierName(GetNamespace(_class))),
-                    UsingDirective(
-                        QualifiedName(
-                            IdentifierName("NUnit"),
-                            IdentifierName("Framework")))
-                });
+            UsingDirectiveSyntax[] usings;
 
             // add class
             var classDeclaration = ClassDeclaration(_class.Identifier + "Tests")
@@ -60,6 +54,7 @@ public class TestGenerator
             var constructors = _class.DescendantNodes().OfType<ConstructorDeclarationSyntax>();
             List<string> interfaces = new List<string>();
             var @params = new SeparatedSyntaxList<ParameterSyntax>();
+            var interfaceParams = new List<ParameterSyntax>();
             foreach (var constructor in constructors)
             {
                 @params = constructor.ParameterList.Parameters;
@@ -67,26 +62,50 @@ public class TestGenerator
                 {
                     var text = param.Type.ToString();
                     if (param.Type.ToString().StartsWith("I"))
+                    {
                         interfaces.Add(param.Type.ToString());
+                        interfaceParams.Add(param);
+                    }
                 }
             }
 
-            List<MethodDeclarationSyntax> methodDeclaration = new List<MethodDeclarationSyntax>();
 
             // add setup
             if (interfaces.Count > 0)
             {
-                classDeclaration = CreateTestWithSetUp(_class, classDeclaration, interfaces, @params);
-                classDeclaration = GetHardMethod(_class, classDeclaration, interfaces, @params, methods);
+                classDeclaration = CreateTestWithSetUp(_class, classDeclaration, interfaces, @params,interfaceParams);
+                classDeclaration = GetHardMethod(_class, classDeclaration, methods);
+                usings = 
+                    new UsingDirectiveSyntax[]
+                    {
+                        UsingDirective(
+                            IdentifierName(GetNamespace(_class))),
+                        UsingDirective(
+                            QualifiedName(
+                                IdentifierName("NUnit"),
+                                IdentifierName("Framework"))),
+                        UsingDirective(
+                            IdentifierName("Moq"))
+                    };
             }
             else
             {
                 classDeclaration = GetSimpleMethod(classDeclaration, methods);
+                usings = 
+                    new UsingDirectiveSyntax[]
+                    {
+                        UsingDirective(
+                            IdentifierName(GetNamespace(_class))),
+                        UsingDirective(
+                            QualifiedName(
+                                IdentifierName("NUnit"),
+                                IdentifierName("Framework")))
+                    };
             }
 
             @namespace = ((NamespaceDeclarationSyntax)@namespace).AddMembers(classDeclaration);
 
-            mainUnit = mainUnit.WithUsings(usings);
+            mainUnit = mainUnit.WithUsings(new SyntaxList<UsingDirectiveSyntax>(allUsings.Concat(usings)));
             mainUnit = mainUnit.WithMembers(SingletonList<MemberDeclarationSyntax>(@namespace)).NormalizeWhitespace();
             _testInfo.Add(new TestInfo
             {
@@ -117,13 +136,14 @@ public class TestGenerator
         return classDeclaration;
     }
 
-    private ClassDeclarationSyntax GetHardMethod(ClassDeclarationSyntax @class, ClassDeclarationSyntax classDeclaration, List<string> interfaces, SeparatedSyntaxList<ParameterSyntax> @params, List<MethodDeclarationSyntax> methods)
+    private ClassDeclarationSyntax GetHardMethod(ClassDeclarationSyntax @class, ClassDeclarationSyntax classDeclaration, List<MethodDeclarationSyntax> methods)
     {
         foreach (var method in methods)
         {
             if (method.ReturnType.ToString() == "void")
             {
                 classDeclaration = GetSimpleMethod(classDeclaration, new List<MethodDeclarationSyntax>() { method });
+                continue;
             } 
             var classObjectName = @class.Identifier.ToString().Insert(1, @class.Identifier.ToString().Substring(0, 1).ToLower()).Remove(0, 1);
             var methodStatements = new List<StatementSyntax>();
@@ -135,8 +155,8 @@ public class TestGenerator
                 methodStatements.Add(ParseStatement($"{parameter.Type.ToString()} {parameter.Identifier} = default;"));
                 paramsStr += parameter.Identifier + ",";
             }
-
-            paramsStr = paramsStr.Remove(paramsStr.Length - 1, 1);
+            if (paramsStr != "")
+                paramsStr = paramsStr.Remove(paramsStr.Length - 1, 1);
             
             // act
             methodStatements.Add(ParseStatement($"{method.ReturnType} actual = _{classObjectName}UnderTest.{method.Identifier}({paramsStr});"));
@@ -160,8 +180,10 @@ public class TestGenerator
         return classDeclaration;
     }
 
+
+
     // add fields and setup
-    private ClassDeclarationSyntax CreateTestWithSetUp(ClassDeclarationSyntax @class, ClassDeclarationSyntax newClass, List<string> interfaces, SeparatedSyntaxList<ParameterSyntax> @params)
+    private ClassDeclarationSyntax CreateTestWithSetUp(ClassDeclarationSyntax @class, ClassDeclarationSyntax newClass, List<string> interfaces, SeparatedSyntaxList<ParameterSyntax> @params, List<ParameterSyntax> intParams)
     {
         // add fields
         var fields = new List<FieldDeclarationSyntax>();
@@ -173,17 +195,16 @@ public class TestGenerator
             .AddModifiers(Token(SyntaxKind.PrivateKeyword)));
         string setupBlock = "";
         string classObject = $"_{classObjectName}UnderTest = new {@class.Identifier}(";
-        foreach (var @interface in interfaces)
+        foreach (var intParam in intParams)
         {
-            string varName = @interface.Insert(2, @interface.Substring(1, 1).ToLower()).Remove(0, 2);
-            variableDeclaration = VariableDeclaration(ParseTypeName($"Mock<{@interface}>"))
-                .AddVariables(VariableDeclarator($"_{varName}"));
+            variableDeclaration = VariableDeclaration(ParseTypeName($"Mock<{intParam.Type.ToString()}>"))
+                .AddVariables(VariableDeclarator($"{intParam.Identifier}"));
             fields.Add(FieldDeclaration(variableDeclaration)
                 .AddModifiers(Token(SyntaxKind.PrivateKeyword)));
             
             // text for assignments variable
-            setupStatements.Add(ParseStatement($"_{varName} = new Mock<{@interface}>();"));
-            classObject += $"{varName}.Object, ";
+            setupStatements.Add(ParseStatement($"{intParam.Identifier} = new Mock<{intParam.Type.ToString()}>();"));
+            classObject += $"{intParam.Identifier}.Object, ";
         }
         
         foreach (var param in @params)
@@ -222,19 +243,15 @@ public class TestGenerator
         
         if (potentialNamespaceParent is BaseNamespaceDeclarationSyntax namespaceParent)
         {
-            // We have a namespace. Use that as the type
             nameSpace = namespaceParent.Name.ToString();
-        
-            // Keep moving "out" of the namespace declarations until we 
-            // run out of nested namespace declarations
+            
             while (true)
             {
                 if (namespaceParent.Parent is not NamespaceDeclarationSyntax parent)
                 {
                     break;
                 }
-
-                // Add the outer namespace as a prefix to the final namespace
+                
                 nameSpace = $"{namespaceParent.Name}.{nameSpace}";
                 namespaceParent = parent;
             }
