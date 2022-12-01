@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace TestGenerator.Core;
 
-public class TestGenerator
+public class UnitTestGenerator
 {
     public class TestInfo
     {
@@ -15,7 +15,7 @@ public class TestGenerator
 
     private List<TestInfo> _testInfo;
 
-    public TestGenerator()
+    public UnitTestGenerator()
     {
         _testInfo = new List<TestInfo>();
     }
@@ -241,19 +241,19 @@ public class TestGenerator
             potentialNamespaceParent = potentialNamespaceParent.Parent;
         }
         
-        if (potentialNamespaceParent is BaseNamespaceDeclarationSyntax namespaceParent)
+        if (potentialNamespaceParent is BaseNamespaceDeclarationSyntax)
         {
-            nameSpace = namespaceParent.Name.ToString();
+            nameSpace = ((BaseNamespaceDeclarationSyntax)potentialNamespaceParent).Name.ToString();
             
             while (true)
             {
-                if (namespaceParent.Parent is not NamespaceDeclarationSyntax parent)
+                if (potentialNamespaceParent.Parent is not NamespaceDeclarationSyntax)
                 {
                     break;
                 }
-                
-                nameSpace = $"{namespaceParent.Name}.{nameSpace}";
-                namespaceParent = parent;
+
+                potentialNamespaceParent = potentialNamespaceParent.Parent;
+                nameSpace += "." + ((BaseNamespaceDeclarationSyntax)potentialNamespaceParent).Name;
             }
         }
         return nameSpace;

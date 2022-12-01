@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks.Dataflow;
+using TestGenerator.Core;
 
 namespace ConsoleGenerator;
 
@@ -9,7 +10,7 @@ public class TestGeneratorService
     private int _taskDegreeOfParallelism;
     private int _outFileDegreeOfParallelism;
     private string _outputDirectory;
-    private TestGenerator.Core.TestGenerator _testGenerator;
+    private UnitTestGenerator _testGenerator;
 
     public TestGeneratorService(string[] filenames, int sourceFileDegreeOfParallelism, int taskDegreeOfParallelism,
         int outFileDegreeOfParallelism, string outputDirectory)
@@ -19,7 +20,7 @@ public class TestGeneratorService
         _sourceFileDegreeOfParallelism = sourceFileDegreeOfParallelism;
         _outFileDegreeOfParallelism = outFileDegreeOfParallelism;
         _outputDirectory = outputDirectory;
-        _testGenerator = new TestGenerator.Core.TestGenerator();
+        _testGenerator = new UnitTestGenerator();
     }
 
     public void Generate()
@@ -35,12 +36,12 @@ public class TestGeneratorService
             return new string(buffer);
         }, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = _sourceFileDegreeOfParallelism });
 
-        var generateTests = new TransformBlock<string, List<TestGenerator.Core.TestGenerator.TestInfo>>(programCode =>
+        var generateTests = new TransformBlock<string, List<UnitTestGenerator.TestInfo>>(programCode =>
         {
             return _testGenerator.Generate(programCode);
         }, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = _taskDegreeOfParallelism});
 
-        var writeTests = new ActionBlock<List<TestGenerator.Core.TestGenerator.TestInfo>>(async testInfos =>
+        var writeTests = new ActionBlock<List<UnitTestGenerator.TestInfo>>(async testInfos =>
         {
             foreach (var testInfo in testInfos)
             {
