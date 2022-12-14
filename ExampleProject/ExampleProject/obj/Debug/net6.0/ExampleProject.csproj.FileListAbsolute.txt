@@ -1,0 +1,5 @@
+C:\Users\bobro\RiderProjects\TestsGenerator\ExampleProject\ExampleProject\obj\Debug\net6.0\ExampleProject.csproj.AssemblyReference.cache
+C:\Users\bobro\RiderProjects\TestsGenerator\ExampleProject\ExampleProject\obj\Debug\net6.0\ExampleProject.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\bobro\RiderProjects\TestsGenerator\ExampleProject\ExampleProject\obj\Debug\net6.0\ExampleProject.AssemblyInfoInputs.cache
+C:\Users\bobro\RiderProjects\TestsGenerator\ExampleProject\ExampleProject\obj\Debug\net6.0\ExampleProject.AssemblyInfo.cs
+C:\Users\bobro\RiderProjects\TestsGenerator\ExampleProject\ExampleProject\obj\Debug\net6.0\ExampleProject.csproj.CoreCompileInputs.cache
